@@ -1,22 +1,30 @@
-import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const token = req.header('Authorization')?.split(' ')[1];
+export interface AuthRequest extends Request {
+  user?: { id: string };
+}
 
-  if (!token) {
-    res.status(401).json({ message: 'No authentication token, authorization denied' });
-    return;
-  }
-
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET as string);
-    (req as any).user = verified;
-    next();
+    const token = req.headers['token'] as string;
+    if (!token) {
+      res.status(401).json({ message: 'Authorization token is missing or invalid' });
+      return;
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload & { id?: string };
+
+    if (decoded && typeof decoded === 'object' && 'id' in decoded) {
+      req.user = { id: decoded.id as string };
+      next();
+    } else {
+      res.status(401).json({ message: 'Authorization failed' });
+    }
   } catch (error) {
-    res.status(401).json({ message: 'Token verification failed, authorization denied' });
+    res.status(500).json({ message: 'Authorization failed' });
   }
 };
