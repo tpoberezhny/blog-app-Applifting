@@ -8,12 +8,12 @@ import {
 const router = express.Router();
 
 // Create a new comment
-router.post('/comments', createComment);
+router.post('/', createComment);
 
 // Upvote a comment
-router.post('/comments/:commentId/vote/up', upvoteComment);
+router.post('/:commentId/vote/up', upvoteComment);
 
 // Downvote a comment
-router.post('/comments/:commentId/vote/down', downvoteComment);
+router.post('/:commentId/vote/down', downvoteComment);
 
 export default router;

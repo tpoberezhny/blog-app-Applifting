@@ -11,18 +11,18 @@ import { authMiddleware } from '../middleware/auth';
 const router = express.Router();
 
 // Get all articles
-router.get('/articles', getAllArticles);
+router.get('/', getAllArticles);
 
 // Create a new article (Protected)
-router.post('/articles', authMiddleware, createArticle);
+router.post('/', authMiddleware, createArticle);
 
 // Get an article by ID
-router.get('/articles/:articleId', getArticleById);
+router.get('/:articleId', getArticleById);
 
 // Update an article by ID (Protected)
-router.patch('/articles/:articleId', authMiddleware, updateArticleById);
+router.patch('/:articleId', authMiddleware, updateArticleById);
 
 // Delete an article by ID (Protected)
-router.delete('/articles/:articleId', authMiddleware, deleteArticleById);
+router.delete('/:articleId', authMiddleware, deleteArticleById);
 
 export default router;
