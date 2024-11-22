@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Article from '../models/Article';
 import mongoose from 'mongoose';
+import { AuthRequest } from '../middleware/auth';
 
 export const getAllArticles = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -13,8 +14,20 @@ export const getAllArticles = async (req: Request, res: Response): Promise<void>
 
 export const createArticle = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, perex, content, author } = req.body;
-    const article = new Article({ title, perex, content, author });
+    const authReq = req as AuthRequest;
+    const { title, perex, content } = req.body;
+
+    if (!authReq.user || !authReq.user.id) {
+      res.status(401).json({ message: 'Unauthorized: Missing user information' });
+      return;
+    }
+
+    if (!title || !perex || !content) {
+      res.status(400).json({ message: 'Title, perex, and content are required' });
+      return;
+    }
+
+    const article = new Article({ title, perex, content, author: authReq.user.id });
     await article.save();
     res.status(201).json(article);
   } catch (error) {
