@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/articles', articleRoutes);
-app.use('/api/comments', commentRoutes);
+app.use('/api/articles/:articleId/comments', commentRoutes);
 app.use('/api/users', userRoutes);
 
 // Connect to MongoDB and start server

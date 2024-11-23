@@ -5,9 +5,9 @@ import {
   downvoteComment
 } from '../controllers/commentController';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
-// Create a new comment
+// Create a new comment on a specific article
 router.post('/', createComment);
 
 // Upvote a comment
