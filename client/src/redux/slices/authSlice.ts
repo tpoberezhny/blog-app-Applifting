@@ -1,8 +1,15 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
 interface UserState {
   email: string | null;
+  user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   error: string | null;
@@ -10,6 +17,7 @@ interface UserState {
 
 const initialState: UserState = {
   email: null,
+  user: null,
   token: null,
   isAuthenticated: false,
   error: null,
@@ -35,6 +43,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
+      state.user = null;
       state.email = null;
       state.token = null;
       state.isAuthenticated = false;
@@ -43,13 +52,13 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(loginUser.fulfilled, (state, action) => {
+    builder.addCase(loginUser.fulfilled, (state, action: PayloadAction<{ token: string; user: User }>) => {
       state.token = action.payload.token;
-      state.email = action.meta.arg.email;
+      state.user = action.payload.user;
       state.isAuthenticated = true;
       state.error = null;
       localStorage.setItem('token', action.payload.token);
-      localStorage.setItem('email', action.meta.arg.email);
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
     });
     builder.addCase(loginUser.rejected, (state, action) => {
       state.error = action.payload as string;

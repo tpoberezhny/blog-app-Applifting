@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Login from './pages/Login';
-import './App.css';
 import RecentArticles from './pages/RecentArticles';
+import ArticleDetail from './pages/ArticleDetail';
+import './App.css';
 
 const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<RecentArticles />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/articles/:id" element={<ArticleDetail />} />
           </Routes>
         </div>
       </div>
