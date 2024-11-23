@@ -23,7 +23,7 @@ const RecentArticles: React.FC = () => {
     <div className="px-10 py-8">
       <h1 className="text-3xl font-bold mb-6 text-left">Recent Articles</h1>
       {articles.map((article) => (
-        <div key={article.id} className="flex items-start mb-8 text-left">
+        <div key={article._id} className="flex items-start mb-8 text-left">
           <img
             src={article.imageUrl}
             alt={article.title}
@@ -36,7 +36,7 @@ const RecentArticles: React.FC = () => {
             </p>
             <p className="text-gray-700 mb-4">{article.perex}</p>
             <a
-              href={`/articles/${article.id}`}
+              href={`/articles/${article._id}`}
               className="text-blue-600 hover:underline"
             >
               Read whole article

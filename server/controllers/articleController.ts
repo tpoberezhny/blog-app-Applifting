@@ -41,7 +41,7 @@ export const getArticleById = async (req: Request, res: Response): Promise<void>
       res.status(400).json({ message: 'Invalid article ID' });
       return;
     }
-    const article = await Article.findById(req.params.articleId);
+    const article = await Article.findById(req.params.articleId).populate('author', 'name');
     if (!article) {
       res.status(404).json({ message: 'Article not found' });
       return;
