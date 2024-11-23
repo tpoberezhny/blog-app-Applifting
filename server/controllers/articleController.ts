@@ -5,7 +5,7 @@ import { AuthRequest } from '../middleware/auth';
 
 export const getAllArticles = async (req: Request, res: Response): Promise<void> => {
   try {
-    const articles = await Article.find().sort({ createdAt: -1 });
+    const articles = await Article.find().populate('author', 'name').sort({ createdAt: -1 });
     res.status(200).json(articles);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -17,7 +17,7 @@ export const createArticle = async (req: Request, res: Response): Promise<void> 
     const authReq = req as AuthRequest;
     const { title, perex, content } = req.body;
 
-    if (!authReq.user || !authReq.user.id) {
+    if (!authReq.user || !authReq.user.id || !authReq.user.name) {
       res.status(401).json({ message: 'Unauthorized: Missing user information' });
       return;
     }

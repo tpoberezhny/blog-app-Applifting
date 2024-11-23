@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string, name: string };
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -16,10 +16,11 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
       return;
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload & { id?: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload & { id?: string, name?: string };
 
     if (decoded && typeof decoded === 'object' && 'id' in decoded) {
-      req.user = { id: decoded.id as string };
+      req.user = { id: decoded.id as string, name: decoded.name as string };
+      console.log(req.user);
       next();
     } else {
       res.status(401).json({ message: 'Authorization failed' });

@@ -1,10 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+export interface Author {
+  name: string;
+}
+
 export interface Article {
   id: string;
   title: string;
-  author: string;
+  author: Author;
   updatedAt: string;
   perex: string;
   commentsCount: number;

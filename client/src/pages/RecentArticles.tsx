@@ -32,7 +32,7 @@ const RecentArticles: React.FC = () => {
           <div>
             <h2 className="text-xl font-bold">{article.title}</h2>
             <p className="text-sm text-gray-600 mb-2">
-            {article.author} • {format(new Date(article.updatedAt), 'MMM dd, yyyy')}
+            {article.author.name} • {format(new Date(article.updatedAt), 'MM/dd/yyyy')}
             </p>
             <p className="text-gray-700 mb-4">{article.perex}</p>
             <a
