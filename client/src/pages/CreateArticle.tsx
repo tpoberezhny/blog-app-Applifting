@@ -43,7 +43,7 @@ const CreateArticle: React.FC = () => {
         alert("Failed to create article: " + resultAction.payload);
         return;
       }
-      navigate("/");
+      navigate("/my-articles");
 
     } catch (error) {
       alert("Something went wrong while creating the article.");
