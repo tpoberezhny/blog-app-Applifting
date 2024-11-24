@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const NavBar: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, email } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -37,7 +37,7 @@ const NavBar: React.FC = () => {
             <Link to="/create-article" className="text-md hover:underline">
               Create Article
             </Link>
-            <span className="font-semibold">{email}</span>
+            <span className="font-semibold">{user?.name}</span>
             <button
               onClick={handleLogout}
               className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition duration-200"
