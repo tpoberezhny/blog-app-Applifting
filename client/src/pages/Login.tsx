@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/slices/authSlice";
 import { RootState, AppDispatch } from "../redux/store";
@@ -18,9 +18,13 @@ const Login: React.FC = () => {
     dispatch(loginUser({ email, password }));
   };
 
-  if (isAuthenticated) {
-    navigate("/");
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
