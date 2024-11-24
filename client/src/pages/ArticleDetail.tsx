@@ -6,6 +6,7 @@ import {
   addComment,
   upvoteComment,
   downvoteComment,
+  fetchCommentsByArticleId,
 } from "../redux/slices/commentSlice";
 import { RootState, AppDispatch } from "../redux/store";
 import { format } from "date-fns";
@@ -17,20 +18,23 @@ const ArticleDetail: React.FC = () => {
   const { articleDetail, loading, error } = useSelector(
     (state: RootState) => state.articles
   );
+  const { comments } = useSelector(
+    (state: RootState) => state.comments
+  );
   const { user } = useSelector((state: RootState) => state.auth);
   const [newComment, setNewComment] = useState<string>("");
 
   useEffect(() => {
     if (id) {
       dispatch(fetchArticleById(id));
+      dispatch(fetchCommentsByArticleId(id));
     }
   }, [dispatch, id]);
 
   const handleAddComment = () => {
     if (user && id) {
-      dispatch(
-        addComment({ articleId: id, content: newComment, author: user.name })
-      );
+      console.log("Adding comment:", { articleId: id, content: newComment, author: user.name });
+      dispatch(addComment({ articleId: id, content: newComment, author: user.name }));
       setNewComment("");
     } else {
       alert("You need to log in to add a comment");
@@ -81,8 +85,7 @@ const ArticleDetail: React.FC = () => {
       {/* Comments Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">
-          Comments ({articleDetail.comments ? articleDetail.comments.length : 0}
-          )
+        Comments ({comments.length})
         </h2>
         {user ? (
           <div className="mb-4">
@@ -111,9 +114,8 @@ const ArticleDetail: React.FC = () => {
             to join the discussion.
           </p>
         )}
-        {articleDetail.comments &&
-          articleDetail.comments.map((comment) => (
-            <div key={comment.id} className="mb-6 border-b pb-4">
+        {comments.map((comment) => (
+            <div key={comment._id} className="mb-6 border-b pb-4">
               <p className="font-bold text-sm">
                 {comment.author} •{" "}
                 {format(new Date(comment.createdAt), "MM/dd/yyyy")}
@@ -122,13 +124,13 @@ const ArticleDetail: React.FC = () => {
               <div className="flex space-x-4 text-sm text-gray-600">
                 <button
                   className="hover:text-blue-600"
-                  onClick={() => handleUpvoteComment(comment.id)}
+                  onClick={() => handleUpvoteComment(comment._id)}
                 >
                   Upvote ({comment.votes})
                 </button>
                 <button
                   className="hover:text-blue-600"
-                  onClick={() => handleDownvoteComment(comment.id)}
+                  onClick={() => handleDownvoteComment(comment._id)}
                 >
                   Downvote
                 </button>

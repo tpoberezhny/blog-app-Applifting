@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export interface Comment {
-  id: string;
+  _id: string;
   author: string;
   content: string;
   createdAt: string;
@@ -21,60 +21,140 @@ const initialState: CommentState = {
   error: null,
 };
 
+export const fetchCommentsByArticleId = createAsyncThunk(
+  "comments/fetchCommentsByArticleId",
+  async (articleId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/articles/${articleId}/comments`
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 export const addComment = createAsyncThunk(
-  'comments/addComment',
-  async ({ articleId, content, author }: { articleId: string; content: string; author: string }) => {
-    const response = await axios.post(`http://localhost:5000/api/articles/${articleId}/comments`, { content, author });
-    return response.data;
+  "comments/addComment",
+  async (
+    {
+      articleId,
+      content,
+      author,
+    }: { articleId: string; content: string; author: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      console.log("Sending request to add comment:", { content, author });
+      const response = await axios.post(
+        `http://localhost:5000/api/articles/${articleId}/comments`,
+        { content, author }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error adding comment:", error.response.data);
+      return rejectWithValue(error.response.data.message);
+    }
   }
 );
 
 export const upvoteComment = createAsyncThunk(
-  'comments/upvoteComment',
-  async ({ articleId, commentId }: { articleId: string; commentId: string }) => {
-    const response = await axios.post(`http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/up`);
+  "comments/upvoteComment",
+  async ({
+    articleId,
+    commentId,
+  }: {
+    articleId: string;
+    commentId: string;
+  }) => {
+    const response = await axios.post(
+      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/up`
+    );
     return response.data;
   }
 );
 
 export const downvoteComment = createAsyncThunk(
-  'comments/downvoteComment',
-  async ({ articleId, commentId }: { articleId: string; commentId: string }) => {
-    const response = await axios.post(`http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/down`);
+  "comments/downvoteComment",
+  async ({
+    articleId,
+    commentId,
+  }: {
+    articleId: string;
+    commentId: string;
+  }) => {
+    const response = await axios.post(
+      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/down`
+    );
     return response.data;
   }
 );
 
 const commentSlice = createSlice({
-  name: 'comments',
+  name: "comments",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchCommentsByArticleId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchCommentsByArticleId.fulfilled,
+        (state, action: PayloadAction<Comment[]>) => {
+          state.loading = false;
+          state.comments = action.payload;
+        }
+      )
+      .addCase(fetchCommentsByArticleId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(addComment.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(addComment.fulfilled, (state, action: PayloadAction<Comment>) => {
-        state.loading = false;
-        state.comments.push(action.payload);
-      })
+      .addCase(
+        addComment.fulfilled,
+        (state, action: PayloadAction<Comment>) => {
+          state.loading = false;
+          state.comments.push(action.payload);
+        }
+      )
       .addCase(addComment.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to add comment';
+        state.error = action.error.message || "Failed to add comment";
       })
-      .addCase(upvoteComment.fulfilled, (state, action: PayloadAction<{ commentId: string; votes: number }>) => {
-        const comment = state.comments.find((c) => c.id === action.payload.commentId);
-        if (comment) {
-          comment.votes = action.payload.votes;
+      .addCase(
+        upvoteComment.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ commentId: string; votes: number }>
+        ) => {
+          const comment = state.comments.find(
+            (c) => c._id === action.payload.commentId
+          );
+          if (comment) {
+            comment.votes = action.payload.votes;
+          }
         }
-      })
-      .addCase(downvoteComment.fulfilled, (state, action: PayloadAction<{ commentId: string; votes: number }>) => {
-        const comment = state.comments.find((c) => c.id === action.payload.commentId);
-        if (comment) {
-          comment.votes = action.payload.votes;
+      )
+      .addCase(
+        downvoteComment.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ commentId: string; votes: number }>
+        ) => {
+          const comment = state.comments.find(
+            (c) => c._id === action.payload.commentId
+          );
+          if (comment) {
+            comment.votes = action.payload.votes;
+          }
         }
-      });
+      );
   },
 });
 

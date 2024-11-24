@@ -2,6 +2,23 @@ import { Request, Response } from 'express';
 import Comment from '../models/Comment';
 import mongoose from 'mongoose';
 
+export const getCommentsByArticleId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { articleId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(articleId)) {
+      res.status(400).json({ message: 'Invalid article ID' });
+      return;
+    }
+
+    const comments = await Comment.find({ articleId });
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error('Error while fetching comments:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const createComment = async (req: Request, res: Response): Promise<void> => {
   try {
     const { content, author } = req.body;
