@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchArticleById } from "../redux/slices/articleSlice";
+import { fetchArticleById } from "../redux/slices/fetchArticles";
 import {
   addComment,
   upvoteComment,

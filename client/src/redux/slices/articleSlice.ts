@@ -1,6 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-import { RootState } from "../store";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchArticles, fetchArticleById } from "./fetchArticles";
+import { createArticle } from "./createArticle";
+import { deleteArticle } from "./deleteArticle";
+import { updateArticle } from "./updateArticle";
 
 export interface Author {
   name: string;
@@ -38,116 +40,6 @@ const initialState: ArticleState = {
   loading: false,
   error: null,
 };
-
-export const fetchArticles = createAsyncThunk(
-  "articles/fetchArticles",
-  async () => {
-    const response = await axios.get("http://localhost:5000/api/articles");
-    return response.data;
-  }
-);
-
-export const fetchArticleById = createAsyncThunk(
-  "articles/fetchArticleById",
-  async (id: string) => {
-    const response = await axios.get(
-      `http://localhost:5000/api/articles/${id}`
-    );
-    return response.data;
-  }
-);
-
-export const createArticle = createAsyncThunk(
-  "articles/createArticle",
-  async (formData: FormData, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        throw new Error("Unauthorized: Missing authentication token");
-      }
-
-      const response = await axios.post(
-        "http://localhost:5000/api/articles",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create an article"
-      );
-    }
-  }
-);
-
-export const deleteArticle = createAsyncThunk(
-  "articles/deleteArticle",
-  async (id: string, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-      if (!token) {
-        throw new Error("Unauthorized: Missing authentication token");
-      }
-
-      const response = await axios.delete(
-        `http://localhost:5000/api/articles/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete the article"
-      );
-    }
-  }
-);
-
-export const updateArticle = createAsyncThunk(
-  "articles/updateArticle",
-  async (
-    { id, formData }: { id: string; formData: FormData },
-    { getState, rejectWithValue }
-  ) => {
-    try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-      if (!token) {
-        throw new Error("Unauthorized: Missing authentication token");
-      }
-
-      const response = await axios.patch(
-        `http://localhost:5000/api/articles/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update the article"
-      );
-    }
-  }
-);
 
 const articleSlice = createSlice({
   name: "articles",

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArticles } from "../redux/slices/articleSlice";
+import { fetchArticles } from "../redux/slices/fetchArticles";
 import { RootState, AppDispatch } from "../redux/store";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchArticles, deleteArticle } from "../redux/slices/articleSlice";
+import { fetchArticles } from "../redux/slices/fetchArticles";
+import { deleteArticle } from "../redux/slices/deleteArticle";
 import { RootState, AppDispatch } from "../redux/store";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store";
-import { createArticle } from "../redux/slices/articleSlice";
+import { createArticle } from "../redux/slices/createArticle";
 import { useNavigate } from "react-router-dom";
 import ReactMde from "react-mde";
 import "react-mde/lib/styles/css/react-mde-all.css";

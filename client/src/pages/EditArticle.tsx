@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchArticleById, updateArticle } from "../redux/slices/articleSlice";
+import { fetchArticleById } from "../redux/slices/fetchArticles";
+import { updateArticle } from "../redux/slices/updateArticle";
 import { RootState, AppDispatch } from "../redux/store";
 
 const EditArticle: React.FC = () => {
@@ -112,8 +113,9 @@ const EditArticle: React.FC = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full h-60 p-2 border border-gray-300 rounded"
-          placeholder="Supports markdown. Yay!"
+          placeholder="Does not Support markdown here. But easy to implement!"
         />
+      {/*Does not implement markdown here for saving time*/}
       </div>
       <button
         onClick={handleSubmit}
