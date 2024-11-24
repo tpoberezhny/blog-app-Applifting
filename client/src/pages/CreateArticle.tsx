@@ -3,10 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store";
 import { createArticle } from "../redux/slices/articleSlice";
 import { useNavigate } from "react-router-dom";
+import ReactMde from "react-mde";
+import "react-mde/lib/styles/css/react-mde-all.css";
+import Showdown from "showdown";
 
 const CreateArticle: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
+  const [selectedTab, setSelectedTab] = useState<"write" | "preview">("write");
   const [image, setImage] = useState<File | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -44,17 +48,20 @@ const CreateArticle: React.FC = () => {
         return;
       }
       navigate("/my-articles");
-
     } catch (error) {
       alert("Something went wrong while creating the article.");
     }
   };
 
+  const converter = new Showdown.Converter();
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-6 text-left">
       <h1 className="text-3xl font-bold mb-6">Create new article</h1>
       <div className="mb-4">
-        <label className="block text-lg font-semibold mb-2">Article Title</label>
+        <label className="block text-lg font-semibold mb-2">
+          Article Title
+        </label>
         <input
           type="text"
           value={title}
@@ -63,7 +70,9 @@ const CreateArticle: React.FC = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-lg font-semibold mb-2">Featured Image</label>
+        <label className="block text-lg font-semibold mb-2">
+          Featured Image
+        </label>
         <input
           type="file"
           accept="image/*"
@@ -73,11 +82,22 @@ const CreateArticle: React.FC = () => {
       </div>
       <div className="mb-4">
         <label className="block text-lg font-semibold mb-2">Content</label>
-        <textarea
+        <ReactMde
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full h-60 p-2 border border-gray-300 rounded"
-          placeholder="Supports markdown. Yay!"
+          onChange={setContent}
+          selectedTab={selectedTab}
+          onTabChange={setSelectedTab}
+          generateMarkdownPreview={(markdown) =>
+            Promise.resolve(converter.makeHtml(markdown))
+          }
+          childProps={{
+            writeButton: {
+              tabIndex: -1,
+            },
+          }}
+          classes={{
+            textArea: "w-full p-2 border border-gray-300 rounded h-60",
+          }}
         />
       </div>
       <button

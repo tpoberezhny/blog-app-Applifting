@@ -10,6 +10,7 @@ import {
 } from "../redux/slices/commentSlice";
 import { RootState, AppDispatch } from "../redux/store";
 import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
 
 const ArticleDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,7 @@ const ArticleDetail: React.FC = () => {
       setNewComment("");
     } else {
       alert("You need to log in to add a comment");
-      setTimeout(() => navigate("/login"), 3000);
+      navigate("/login");
     }
   };
 
@@ -59,7 +60,7 @@ const ArticleDetail: React.FC = () => {
       dispatch(upvoteComment({ articleId: id, commentId, userId: user.id }));
     } else {
       alert("You need to log in to upvote");
-      setTimeout(() => navigate("/login"), 3000);
+      navigate("/login");
     }
   };
 
@@ -76,7 +77,7 @@ const ArticleDetail: React.FC = () => {
       dispatch(downvoteComment({ articleId: id, commentId, userId: user.id }));
     } else {
       alert("You need to log in to downvote");
-      setTimeout(() => navigate("/login"), 3000);
+      navigate("/login");
     }
   };
 
@@ -98,7 +99,7 @@ const ArticleDetail: React.FC = () => {
       />
       <div className="text-gray-800 mb-6">
         {articleDetail && articleDetail.content && (
-          <p>{articleDetail.content}</p>
+          <ReactMarkdown>{articleDetail.content}</ReactMarkdown>
         )}
       </div>
 

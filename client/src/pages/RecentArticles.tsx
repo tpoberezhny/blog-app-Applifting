@@ -2,16 +2,20 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchArticles } from "../redux/slices/articleSlice";
 import { RootState, AppDispatch } from "../redux/store";
-import { format } from 'date-fns';
+import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
 
-const truncateContent = (content: string | undefined, maxSentences: number = 2): string => {
+const truncateContent = (
+  content: string | undefined,
+  maxSentences: number = 2
+): string => {
   if (!content) {
-    return 'There is no content';
+    return "There is no content";
   }
 
   // Splitting content into sentences
   const sentences = content.match(/[^.!?]+[.!?]*/g) || [];
-  const summary = sentences.slice(0, maxSentences).join(' ');
+  const summary = sentences.slice(0, maxSentences).join(" ");
   return sentences.length > maxSentences ? `${summary}...` : summary;
 };
 
@@ -43,9 +47,12 @@ const RecentArticles: React.FC = () => {
           <div>
             <h2 className="text-xl font-bold">{article.title}</h2>
             <p className="text-sm text-gray-600 mb-2">
-            {article.author.name} • {format(new Date(article.updatedAt), 'MM/dd/yyyy')}
+              {article.author.name} •{" "}
+              {format(new Date(article.updatedAt), "MM/dd/yyyy")}
             </p>
-            <p className="text-gray-700 mb-4">{truncateContent(article.content)}</p>
+            <p className="text-gray-700 mb-4">
+              <ReactMarkdown>{truncateContent(article.content)}</ReactMarkdown>
+            </p>
             <a
               href={`/articles/${article._id}`}
               className="text-blue-600 hover:underline"
