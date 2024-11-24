@@ -18,9 +18,7 @@ const ArticleDetail: React.FC = () => {
   const { articleDetail, loading, error } = useSelector(
     (state: RootState) => state.articles
   );
-  const { comments } = useSelector(
-    (state: RootState) => state.comments
-  );
+  const { comments } = useSelector((state: RootState) => state.comments);
   const { user } = useSelector((state: RootState) => state.auth);
   const [newComment, setNewComment] = useState<string>("");
 
@@ -33,8 +31,14 @@ const ArticleDetail: React.FC = () => {
 
   const handleAddComment = () => {
     if (user && id) {
-      console.log("Adding comment:", { articleId: id, content: newComment, author: user.name });
-      dispatch(addComment({ articleId: id, content: newComment, author: user.name }));
+      console.log("Adding comment:", {
+        articleId: id,
+        content: newComment,
+        author: user.name,
+      });
+      dispatch(
+        addComment({ articleId: id, content: newComment, author: user.name })
+      );
       setNewComment("");
     } else {
       alert("You need to log in to add a comment");
@@ -44,7 +48,15 @@ const ArticleDetail: React.FC = () => {
 
   const handleUpvoteComment = (commentId: string) => {
     if (user && id) {
-      dispatch(upvoteComment({ articleId: id, commentId }));
+      const existingVote = comments.find(
+        (comment) =>
+          comment._id === commentId &&
+          comment.votesUsers?.[user.id] === "upvote"
+      );
+      if (existingVote) {
+        return; // User has already downvoted this comment.
+      }
+      dispatch(upvoteComment({ articleId: id, commentId, userId: user.id }));
     } else {
       alert("You need to log in to upvote");
       setTimeout(() => navigate("/login"), 3000);
@@ -53,7 +65,15 @@ const ArticleDetail: React.FC = () => {
 
   const handleDownvoteComment = (commentId: string) => {
     if (user && id) {
-      dispatch(downvoteComment({ articleId: id, commentId }));
+      const existingVote = comments.find(
+        (comment) =>
+          comment._id === commentId &&
+          comment.votesUsers?.[user.id] === "downvote"
+      );
+      if (existingVote) {
+        return; // User has already downvoted this comment.
+      }
+      dispatch(downvoteComment({ articleId: id, commentId, userId: user.id }));
     } else {
       alert("You need to log in to downvote");
       setTimeout(() => navigate("/login"), 3000);
@@ -85,7 +105,7 @@ const ArticleDetail: React.FC = () => {
       {/* Comments Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">
-        Comments ({comments.length})
+          Comments ({comments.length})
         </h2>
         {user ? (
           <div className="mb-4">
@@ -115,28 +135,28 @@ const ArticleDetail: React.FC = () => {
           </p>
         )}
         {comments.map((comment) => (
-            <div key={comment._id} className="mb-6 border-b pb-4">
-              <p className="font-bold text-sm">
-                {comment.author} •{" "}
-                {format(new Date(comment.createdAt), "MM/dd/yyyy")}
-              </p>
-              <p className="text-gray-800 mb-2">{comment.content}</p>
-              <div className="flex space-x-4 text-sm text-gray-600">
-                <button
-                  className="hover:text-blue-600"
-                  onClick={() => handleUpvoteComment(comment._id)}
-                >
-                  Upvote ({comment.votes})
-                </button>
-                <button
-                  className="hover:text-blue-600"
-                  onClick={() => handleDownvoteComment(comment._id)}
-                >
-                  Downvote
-                </button>
-              </div>
+          <div key={comment._id} className="mb-6 border-b pb-4">
+            <p className="font-bold text-sm">
+              {comment.author} •{" "}
+              {format(new Date(comment.createdAt), "MM/dd/yyyy")}
+            </p>
+            <p className="text-gray-800 mb-2">{comment.content}</p>
+            <div className="flex space-x-4 text-sm text-gray-600">
+              <button
+                className="hover:text-blue-600"
+                onClick={() => handleUpvoteComment(comment._id)}
+              >
+                Upvote ({comment.votes})
+              </button>
+              <button
+                className="hover:text-blue-600"
+                onClick={() => handleDownvoteComment(comment._id)}
+              >
+                Downvote
+              </button>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
       {/* Related articles placeholder */}
       {/* // We can implement it with: fetching articles with similar tags, categories, or by the same author */}

@@ -7,6 +7,7 @@ export interface Comment {
   content: string;
   createdAt: string;
   votes: number;
+  votesUsers?: { [userId: string]: "upvote" | "downvote" };
 }
 
 interface CommentState {
@@ -64,14 +65,17 @@ export const upvoteComment = createAsyncThunk(
   async ({
     articleId,
     commentId,
+    userId,
   }: {
     articleId: string;
     commentId: string;
+    userId: string;
   }) => {
     const response = await axios.post(
-      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/up`
+      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/up`,
+      { userId }
     );
-    return response.data;
+    return { commentId, votes: response.data.votes, userId };
   }
 );
 
@@ -80,14 +84,17 @@ export const downvoteComment = createAsyncThunk(
   async ({
     articleId,
     commentId,
+    userId,
   }: {
     articleId: string;
     commentId: string;
+    userId: string;
   }) => {
     const response = await axios.post(
-      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/down`
+      `http://localhost:5000/api/articles/${articleId}/comments/${commentId}/vote/down`,
+      { userId }
     );
-    return response.data;
+    return { commentId, votes: response.data.votes, userId };
   }
 );
 
@@ -127,34 +134,22 @@ const commentSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to add comment";
       })
-      .addCase(
-        upvoteComment.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ commentId: string; votes: number }>
-        ) => {
-          const comment = state.comments.find(
-            (c) => c._id === action.payload.commentId
-          );
-          if (comment) {
-            comment.votes = action.payload.votes;
-          }
+      .addCase(upvoteComment.fulfilled, (state, action) => {
+        const { commentId, votes, userId } = action.payload;
+        const comment = state.comments.find((c) => c._id === commentId);
+        if (comment) {
+          comment.votes = votes;
+          comment.votesUsers = { ...comment.votesUsers, [userId]: "upvote" };
         }
-      )
-      .addCase(
-        downvoteComment.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ commentId: string; votes: number }>
-        ) => {
-          const comment = state.comments.find(
-            (c) => c._id === action.payload.commentId
-          );
-          if (comment) {
-            comment.votes = action.payload.votes;
-          }
+      })
+      .addCase(downvoteComment.fulfilled, (state, action) => {
+        const { commentId, votes, userId } = action.payload;
+        const comment = state.comments.find((c) => c._id === commentId);
+        if (comment) {
+          comment.votes = votes;
+          comment.votesUsers = { ...comment.votesUsers, [userId]: "downvote" };
         }
-      );
+      });
   },
 });
 
