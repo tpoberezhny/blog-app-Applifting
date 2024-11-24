@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { RootState } from '../store';
 
 export interface Author {
   name: string;
@@ -19,7 +20,6 @@ export interface Article {
   author: Author;
   content: string;
   updatedAt: string;
-  perex: string;
   commentsCount: number;
   comments: Comment[];
   imageUrl: string; 
@@ -48,6 +48,31 @@ export const fetchArticleById = createAsyncThunk('articles/fetchArticleById', as
   const response = await axios.get(`http://localhost:5000/api/articles/${id}`);
   return response.data;
 });
+
+export const createArticle = createAsyncThunk(
+  "articles/createArticle",
+  async (formData: FormData, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token;
+
+      if (!token) {
+        throw new Error('Unauthorized: Missing authentication token');
+      }
+      
+      const response = await axios.post("http://localhost:5000/api/articles", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create an article');
+    }
+  }
+);
 
 const articleSlice = createSlice({
   name: 'articles',
@@ -78,6 +103,18 @@ const articleSlice = createSlice({
       .addCase(fetchArticleById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch an article';
+      })
+      .addCase(createArticle.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createArticle.fulfilled, (state, action: PayloadAction<Article>) => {
+        state.loading = false;
+        state.articles.push(action.payload);
+      })
+      .addCase(createArticle.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
