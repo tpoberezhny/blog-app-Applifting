@@ -39,11 +39,13 @@ const RecentArticles: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-left">Recent Articles</h1>
       {articles.map((article) => (
         <div key={article._id} className="flex items-start mb-8 text-left">
-          <img
-            src={article.imageUrl}
-            alt={article.title}
-            className="w-48 h-32 object-cover rounded-sm mr-6"
-          />
+          <div className="w-[272px] h-[244px] overflow-hidden flex-shrink-0 rounded-sm mr-6">
+            <img
+              src={article.imageUrl}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div>
             <h2 className="text-xl font-bold">{article.title}</h2>
             <p className="text-sm text-gray-600 mb-2">
