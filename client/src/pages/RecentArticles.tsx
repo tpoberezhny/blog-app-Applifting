@@ -4,6 +4,17 @@ import { fetchArticles } from "../redux/slices/articleSlice";
 import { RootState, AppDispatch } from "../redux/store";
 import { format } from 'date-fns';
 
+const truncateContent = (content: string | undefined, maxSentences: number = 2): string => {
+  if (!content) {
+    return 'There is no content';
+  }
+
+  // Splitting content into sentences
+  const sentences = content.match(/[^.!?]+[.!?]*/g) || [];
+  const summary = sentences.slice(0, maxSentences).join(' ');
+  return sentences.length > maxSentences ? `${summary}...` : summary;
+};
+
 const RecentArticles: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { articles, loading, error } = useSelector(
@@ -27,14 +38,14 @@ const RecentArticles: React.FC = () => {
           <img
             src={article.imageUrl}
             alt={article.title}
-            className="w-48 h-32 object-cover rounded mr-6"
+            className="w-48 h-32 object-cover rounded-sm mr-6"
           />
           <div>
             <h2 className="text-xl font-bold">{article.title}</h2>
             <p className="text-sm text-gray-600 mb-2">
             {article.author.name} • {format(new Date(article.updatedAt), 'MM/dd/yyyy')}
             </p>
-            <p className="text-gray-700 mb-4">{article.perex}</p>
+            <p className="text-gray-700 mb-4">{truncateContent(article.content)}</p>
             <a
               href={`/articles/${article._id}`}
               className="text-blue-600 hover:underline"
