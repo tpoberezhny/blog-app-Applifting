@@ -5,6 +5,7 @@ import RecentArticles from './pages/RecentArticles';
 import ArticleDetail from './pages/ArticleDetail';
 import CreateArticle from './pages/CreateArticle';
 import MyArticles from './pages/MyArticles';
+import EditArticle from './pages/EditArticle';
 import './App.css';
 
 const App: React.FC = () => {
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <Route path="/articles/:id" element={<ArticleDetail />} />
             <Route path="/create-article" element={<CreateArticle />} />
             <Route path="/my-articles" element={<MyArticles />} />
+            <Route path="/edit-article/:id" element={<EditArticle />} />
           </Routes>
         </div>
       </div>

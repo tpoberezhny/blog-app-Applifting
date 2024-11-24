@@ -98,29 +98,56 @@ export const getArticleById = async (
   }
 };
 
-export const updateArticleById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.articleId)) {
-      res.status(400).json({ message: "Invalid article ID" });
-      return;
+export const updateArticleById = [
+  upload.single("image"),
+  async (req: MulterRequest, res: Response): Promise<void> => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.articleId)) {
+        res.status(400).json({ message: "Invalid article ID" });
+        return;
+      }
+      const authReq = req as AuthRequest;
+      if (!authReq.user || !authReq.user.id) {
+        res
+          .status(401)
+          .json({ message: "Unauthorized: Missing user information" });
+        return;
+      }
+      const { title, content, deleteImage } = req.body;
+
+      if (!title || !content) {
+        res.status(400).json({ message: "Title and content are required" });
+        return;
+      }
+      let updateData: any = { title, content };
+
+      if (deleteImage === "true") {
+        updateData.imageUrl = "";
+      }
+
+      if (req.file) {
+        updateData.imageUrl = `data:${
+          req.file.mimetype
+        };base64,${req.file.buffer.toString("base64")}`;
+      }
+
+      const updatedArticle = await Article.findByIdAndUpdate(
+        req.params.articleId,
+        updateData,
+        { new: true }
+      );
+
+      if (!updatedArticle) {
+        res.status(404).json({ message: "Article not found" });
+        return;
+      }
+
+      res.status(200).json(updatedArticle);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    const updatedArticle = await Article.findByIdAndUpdate(
-      req.params.articleId,
-      req.body,
-      { new: true }
-    );
-    if (!updatedArticle) {
-      res.status(404).json({ message: "Article not found" });
-      return;
-    }
-    res.status(200).json(updatedArticle);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  },
+];
 
 export const deleteArticleById = async (
   req: Request,
