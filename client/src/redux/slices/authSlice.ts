@@ -15,11 +15,21 @@ interface UserState {
   error: string | null;
 }
 
+const getUserFromLocalStorage = (): User | null => {
+  try {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  } catch (e) {
+    console.error('Error parsing user from localStorage', e);
+    return null;
+  }
+};
+
 const initialState: UserState = {
-  email: null,
-  user: null,
-  token: null,
-  isAuthenticated: false,
+  email: localStorage.getItem('email') || null,
+  user: getUserFromLocalStorage(),
+  token: localStorage.getItem('token') || null,
+  isAuthenticated: !!localStorage.getItem('token'),
   error: null,
 };
 
@@ -49,6 +59,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem('token');
       localStorage.removeItem('email');
+      localStorage.removeItem('user');
     },
   },
   extraReducers: (builder) => {
@@ -58,6 +69,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.error = null;
       localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('email', action.payload.user.email);
       localStorage.setItem('user', JSON.stringify(action.payload.user));
     });
     builder.addCase(loginUser.rejected, (state, action) => {
