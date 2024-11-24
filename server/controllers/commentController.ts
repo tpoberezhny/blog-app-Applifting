@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Comment from '../models/Comment';
 import mongoose from 'mongoose';
+import Article from '../models/Article';
 
 export const getCommentsByArticleId = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -36,6 +37,8 @@ export const createComment = async (req: Request, res: Response): Promise<void> 
 
     const comment = new Comment({ content, author, articleId });
     await comment.save();
+
+    await Article.findByIdAndUpdate(articleId, { $inc: { commentsCount: 1 } });
     res.status(201).json(comment);
   } catch (error) {
     console.error('Error while creating comment:', error);

@@ -5,7 +5,10 @@ import { AuthRequest } from '../middleware/auth';
 
 export const getAllArticles = async (req: Request, res: Response): Promise<void> => {
   try {
-    const articles = await Article.find().populate('author', 'name').sort({ createdAt: -1 });
+    const articles = await Article.find()
+    .populate('author', 'name')
+    .sort({ createdAt: -1 })
+    .select('title perex author imageUrl commentsCount updatedAt');
     res.status(200).json(articles);
   } catch (error) {
     res.status(500).json({ error: error.message });
